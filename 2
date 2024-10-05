@@ -1,2 +1,96 @@
 Test Test Test 
 tshark -nn -r wlan.pcap -Y '((wlan.fc.type_subtype == 0x08 || wlan.fc.type_subtype == 0x05) && (wlan_mgt.fixed.capabilities.ess == 1) && (wlan_mgt.fixed.capabilities.ibss == 0))'
+
+
+
+3.
+tshark -nn -r wlan.pcap -Y '((wlan.fc.type_subtype == 0x08 || wlan.fc.type_subtype == 0x05) && (wlan_mgt.fixed.capabilities.ess == 1) && (wlan_mgt.fixed.capabilities.ibss == 0))' -T fields -e wlan.bssid | uniq -c
+
+
+4.
+wlan.fc.type_subtype == 0x20
+
+
+
+To guide you step by step from capturing a screenshot of your result to identifying potential bad actors, here is a detailed breakdown based on the instructions in **Module 5 - Activity 5: Network Forensics (Case Study: HackMe Inc.)**:
+
+### **Step-by-Step Process**
+
+1. **Capture a screenshot of your result:**
+   - **Wireshark**: Open the `wlan.pcap` file and enter the display filter `wlan.fc.type_subtype == 0x08`.
+   - Apply the filter and capture a screenshot of the result showing the beacon frames. These frames announce WAPs.
+   - Save your screenshot.
+
+2. **Use `tshark` to filter beacon and probe response frames:**
+   - Open your terminal and run the following command to filter beacon and probe response frames:
+     ```bash
+     tshark -nn -r wlan.pcap -Y '((wlan.fc.type_subtype == 0x08 || wlan.fc.type_subtype == 0x05) && (wlan_mgt.fixed.capabilities.ess == 1) && (wlan_mgt.fixed.capabilities.ibss == 0))'
+     ```
+   - Compare this with the Wireshark output and capture a screenshot of both outputs.
+
+3. **Find BSSID of the WAPs:**
+   - Run the following command to list BSSIDs of the known WAPs:
+     ```bash
+     tshark -nn -r wlan.pcap -Y '((wlan.fc.type_subtype == 0x08 || wlan.fc.type_subtype == 0x05) && (wlan_mgt.fixed.capabilities.ess == 1) && (wlan_mgt.fixed.capabilities.ibss == 0))' -T fields -e wlan.bssid | uniq -c
+     ```
+   - Capture a screenshot of your result.
+
+4. **SSID of the WAP of interest:**
+   - Look at the management frames (subtype 0x08) in Wireshark to find the SSID of the WAP.
+   - Capture a screenshot of the result.
+
+5. **Check Encryption:**
+   - Use the filter `wlan.fc.type_subtype == 0x20` in Wireshark to check for encrypted data frames.
+   - Capture a screenshot of your result.
+
+6. **Use `tcpdump` to count data frames:**
+   - Run the following command to count data frames:
+     ```bash
+     tcpdump -nne -r wlan.pcap 'wlan[0] == 0x08' | wc -l
+     ```
+   - Capture a screenshot and note the number of data frames.
+
+7. **Count encrypted frames using `tcpdump`:**
+   - Run this command to count encrypted frames:
+     ```bash
+     tcpdump -nne -r wlan.pcap 'wlan[0] == 0x08 and wlan[1] & 0x40 == 0x40' | wc -l
+     ```
+   - Capture a screenshot and compare the values with the previous step. 
+
+8. **Stations interacting with the WAP:**
+   - Use the filter `wlan.fc.type_subtype == 0x01 && wlan_mgt.fixed.status_code == 0x0000` in Wireshark to see stations that successfully associated with the WAP.
+   - Capture a screenshot of the result.
+
+9. **Analyze data frame destinations:**
+   - Use this `tshark` command to check encrypted data frames:
+     ```bash
+     tshark -r wlan.pcap -R '((wlan.fc.type_subtype == 0x20) && (wlan.fc.protected == 1)) && (wlan.bssid == 00:23:69:61:00:d0)' -T fields -e wlan.da | sort | uniq -c | sort -nr
+     ```
+   - Capture a screenshot of the result.
+
+10. **Identify potential bad actors:**
+   - Analyze anomalous traffic patterns by looking at the distribution of packets. For instance, if a station sent too many broadcast frames (e.g., `1c:4b:d6:69:cd:07`).
+   - Use the following command to gather statistics:
+     ```bash
+     tshark -r wlan.pcap -R '(wlan.fc.type == 2) && (wlan.bssid == xx:xx:xx:xx:xx:xx)' -T fields -e wlan.sa | sort | uniq -c | sort -nr
+     ```
+   - Capture screenshots of any suspicious activity (e.g., high broadcast traffic).
+
+11. **Check management frame types:**
+   - Use the command to view the number of frames sent by specific MAC addresses:
+     ```bash
+     tshark -r wlan.pcap -R '(wlan.fc.type == 0) && (wlan.bssid == xx:xx:xx:xx:xx:xx)' -T fields -e wlan.sa | sort | uniq -c | sort -nr
+     ```
+
+12. **Pattern and timeline analysis:**
+   - Use `capinfos` to get high-level details about the capture file:
+     ```bash
+     capinfos wlan.pcap
+     ```
+   - Analyze frame patterns over time using timestamps. Capture screenshots for any unusual activity in the timeline.
+
+13. **Complete final analysis:**
+   - Summarize the potential bad actors, patterns, and anomalies identified in the data. Based on MAC addresses like `1c:4b:d6:69:cd:07` or `de:ad:be:ef:13:37`, determine if they were involved in malicious activity.
+   - Capture relevant screenshots of anomalous activity and traffic patterns.
+
+Follow this step-by-step process and capture screenshots for each result as required in the activity instructions.
