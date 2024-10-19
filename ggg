@@ -1,0 +1,25 @@
+4. 
+grep -r 'sid:10000648' rules
+
+
+tcpdump -nnXr tcpdump.log 'ip[4:2] = IP_ID#'
+
+
+
+md5sum exported_file_name
+sha256sum exported_file_name
+
+
+grep -A 3 -B 2 '172.16.16.218' alert
+
+
+grep -B 2 '192.168.1.169' alert | grep '\[\*\*\]' | sort -nr | uniq -c
+
+
+
+grep -A 5 '1:2925:3' alert | grep '192.168.1.169' | head -1
+grep -A 5 '1:2925:3' alert | grep '192.168.1.169' | tail -1
+
+
+
+grep -A 5 '1:2925:3' alert | grep '192.168.1.169' | awk '{ print $2}' | sort | uniq -c | sort -nr
