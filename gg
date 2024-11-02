@@ -1,0 +1,29 @@
+1.
+grep -r '1238-27b-4a38236f5d880' squid
+
+2.
+bless squid/00/05/0000058A
+
+3.
+ls -l 0000058A-edited.jpg
+
+4.
+file 0000058A-edited.jpg
+
+
+md5sum 0000058A-edited.jpg
+sha256sum 0000058A-edited.jpg
+
+5.
+grep -r 'http://www.evil.evl/pwny.jpg' squid
+
+
+
+
+
+
+<iframe src="http://www.evil.evl/pwny.jpg" width="5px" height="5px" frameborder="0"></iframe>
+
+
+
+file://home/student/Documents/Module_7_Files/squid/00000589-edited.html
